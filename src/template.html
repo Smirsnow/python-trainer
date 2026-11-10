@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python-тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6fb; --card:#fff; --ink:#1f2433; --muted:#6b7389; --line:#e3e7f0;
+  --blue:#3572c6; --blue2:#e8f0fc; --yellow:#ffd43b; --yellow2:#fff6d1;
+  --green:#22a35a; --green2:#e3f6ea; --red:#d64545; --red2:#fde9e9;
+  --code:#1e2230; --codeink:#e6e9f2;
+  --r:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:17px;line-height:1.55}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+code,pre,textarea.ed,.mono{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace}
+header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);}
+.hwrap{max-width:980px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;gap:14px}
+.logo{font-weight:900;font-size:20px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.logo .snake{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--blue) 50%,var(--yellow) 50%);display:grid;place-items:center;font-size:18px}
+.spacer{flex:1}
+.gprog{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--muted);font-size:15px}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;min-width:90px}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--green),#5bd18b);border-radius:99px;transition:width .4s}
+.btn{border:0;border-radius:12px;padding:10px 18px;font-weight:800;background:var(--blue);color:#fff;transition:transform .08s,filter .15s}
+.btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px)}
+.btn.ghost{background:var(--blue2);color:var(--blue)}
+.btn.yellow{background:var(--yellow);color:#4a3b00}
+.btn.green{background:var(--green)}
+.btn.small{padding:7px 12px;font-size:15px;border-radius:10px}
+.btn:disabled{opacity:.5;cursor:default}
+main{max-width:980px;margin:0 auto;padding:22px 18px 80px}
+h1{font-size:30px;font-weight:900;margin:6px 0 4px;line-height:1.2}
+.sub{color:var(--muted);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.tcard{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:16px 16px 14px;cursor:pointer;transition:transform .12s,border-color .12s;display:flex;flex-direction:column;gap:8px}
+.tcard:hover{transform:translateY(-2px);border-color:var(--blue)}
+.tcard .top{display:flex;align-items:center;gap:10px}
+.tcard .em{font-size:28px;width:48px;height:48px;border-radius:12px;background:var(--blue2);display:grid;place-items:center;flex:none}
+.tcard .num{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.tcard .tt{font-weight:800;font-size:18px;line-height:1.25}
+.tcard .meta{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);font-weight:700}
+.tcard .meta .bar{flex:1}
+.tcard.done{border-color:var(--green)}
+.howto{background:var(--yellow2);border-radius:var(--r);padding:14px 18px;margin:0 0 22px;font-size:16px}
+.howto b{font-weight:800}
+.panel{background:var(--card);border-radius:var(--r);border:1px solid var(--line);padding:22px 24px}
+.back{background:none;border:0;color:var(--blue);font-weight:800;padding:0;margin-bottom:8px}
+.tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+.tab{border:2px solid var(--line);background:#fff;border-radius:12px;padding:9px 16px;font-weight:800;color:var(--muted)}
+.tab.on{border-color:var(--blue);color:var(--blue);background:var(--blue2)}
+.theory h3{font-size:22px;font-weight:900;margin:26px 0 8px}
+.theory h3:first-child{margin-top:0}
+.theory p{margin:8px 0}
+.theory ul{margin:8px 0;padding-left:22px}
+.theory li{margin:4px 0}
+code{background:var(--blue2);color:#1d4f94;padding:1px 6px;border-radius:6px;font-size:.88em}
+pre{margin:0;white-space:pre-wrap;word-break:break-word}
+pre.code{background:var(--code);color:var(--codeink);padding:14px 16px;border-radius:12px;font-size:15px;margin:10px 0;line-height:1.5}
+.outblock{background:#fff;border:2px dashed #c9d2e3;border-radius:12px;padding:8px 14px 10px;margin:-2px 0 12px}
+.outblock .lbl{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.outblock pre{font-family:"JetBrains Mono",monospace;font-size:15px}
+.typed{background:var(--yellow);color:#4a3b00;border-radius:5px;padding:0 5px;font-weight:600}
+.outblock .legend{float:right;font-size:12px;font-weight:700;color:#8a6a00}
+.tip{background:var(--yellow2);border-left:5px solid var(--yellow);padding:10px 14px;border-radius:10px;margin:14px 0}
+.dots{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.dot{width:36px;height:36px;border-radius:10px;border:2px solid var(--line);background:#fff;font-weight:800;font-size:14px;color:var(--muted);display:grid;place-items:center;padding:0}
+.dot.done{background:var(--green);border-color:var(--green);color:#fff}
+.dot.cur{border-color:var(--blue);color:var(--blue);box-shadow:0 0 0 3px var(--blue2)}
+.dot.done.cur{color:#fff}
+.legend{font-size:14px;color:var(--muted);margin:-6px 0 14px}
+.kind{display:inline-block;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;padding:4px 10px;border-radius:8px;margin-bottom:10px}
+.kind.quiz{background:#efe6ff;color:#6a3fc2}
+.kind.out{background:var(--yellow2);color:#8a6a00}
+.kind.code{background:var(--blue2);color:var(--blue)}
+.q{font-size:19px;font-weight:700;margin:0 0 12px;white-space:pre-wrap}
+.q .mono{font-size:16px;font-weight:600;background:#f1f3f8;border-radius:8px;padding:2px 6px}
+.opts{display:grid;gap:8px;margin-bottom:14px}
+.opt{text-align:left;border:2px solid var(--line);background:#fff;border-radius:12px;padding:11px 14px;font-weight:700;display:flex;gap:10px;align-items:center}
+.opt:hover{border-color:#b9c6de}
+.opt .l{width:28px;height:28px;border-radius:8px;background:#f1f3f8;display:grid;place-items:center;font-weight:900;flex:none;color:var(--muted)}
+.opt.sel{border-color:var(--blue);background:var(--blue2)}
+.opt.ok{border-color:var(--green);background:var(--green2)}
+.opt.bad{border-color:var(--red);background:var(--red2)}
+.inputs{background:#f1f3f8;border-radius:12px;padding:8px 14px;margin:0 0 12px;font-size:15px}
+.inputs b{font-weight:800}
+.inputs .mono{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 7px;margin:0 3px;font-size:14px}
+label.fl{display:block;font-weight:800;font-size:14px;color:var(--muted);margin:10px 0 6px}
+textarea.ans{width:100%;min-height:90px;border:2px solid var(--line);border-radius:12px;padding:10px 12px;font-family:"JetBrains Mono",monospace;font-size:16px;resize:vertical}
+textarea.ans:focus,textarea.ed:focus{outline:none;border-color:var(--blue)}
+textarea.ed{width:100%;min-height:200px;background:var(--code);color:var(--codeink);border:2px solid var(--code);border-radius:12px;padding:12px 14px;font-size:15.5px;line-height:1.55;resize:vertical;tab-size:4;caret-color:var(--yellow)}
+.example{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 6px}
+.example>div{background:#f1f3f8;border-radius:12px;padding:8px 12px}
+.example .lbl{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.example pre{font-family:"JetBrains Mono",monospace;font-size:14.5px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.fb{margin-top:14px;border-radius:12px;padding:12px 16px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--green2);border:2px solid #a8e0bf}
+.fb.bad{background:var(--red2);border:2px solid #f2b8b8}
+.fb.info{background:#f1f3f8;border:2px solid var(--line)}
+.fb h4{margin:0 0 4px;font-size:18px;font-weight:900}
+.fb pre{background:#fff;border-radius:8px;padding:8px 10px;font-family:"JetBrains Mono",monospace;font-size:14px;margin:6px 0}
+.fb .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fb .lbl{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase}
+.navrow{display:flex;justify-content:space-between;margin-top:18px;gap:8px}
+.status{font-size:14px;color:var(--muted);font-weight:700}
+.hint{background:var(--yellow2);border-radius:12px;padding:10px 14px;margin-top:12px;display:none}
+.hint.show{display:block}
+.sol{margin-top:12px;display:none}
+.sol.show{display:block}
+.sbx-out{background:var(--code);color:var(--codeink);border-radius:12px;padding:12px 14px;min-height:80px;font-family:"JetBrains Mono",monospace;font-size:15px;white-space:pre-wrap;margin-top:8px}
+.sbx-out .err{color:#ff9a9a}
+.foot{margin-top:28px;display:flex;gap:10px;align-items:center;color:var(--muted);font-size:14px;flex-wrap:wrap}
+.confetti{position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;z-index:50}
+.donebanner{background:var(--green2);border:2px solid #a8e0bf;border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-weight:800}
+@media (max-width:640px){
+  .hwrap{padding:8px 12px;gap:8px} .gprog .bar{display:none} .logo span.t{display:none}
+  main{padding:16px 12px 70px} .panel{padding:16px 14px} h1{font-size:25px}
+  .example,.fb .cols{grid-template-columns:1fr}
+  .dot{width:32px;height:32px}
+}
+</style>
+</head>
+<body>
+<header><div class="hwrap">
+  <div class="logo" id="home"><div class="snake">🐍</div><span class="t">Python-тренажёр</span></div>
+  <div class="spacer"></div>
+  <div class="gprog"><span id="gcount">0</span><div class="bar" style="width:110px"><i id="gbar" style="width:0"></i></div></div>
+  <button class="btn small yellow" id="sbxBtn">🧪 Песочница</button>
+</div></header>
+<main id="app"></main>
+<canvas class="confetti" id="conf"></canvas>
+
+<script>
+const DATA = /*__DATA__*/null;
+const PYO = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+const KEY = "pytrainer_v1";
+const $ = (s, el=document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// ---------- progress ----------
+let P = {done:{}, code:{}, tries:{}};
+try { const s = localStorage.getItem(KEY); if (s) P = Object.assign(P, JSON.parse(s)); } catch(e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(P)); } catch(e) {} }
+const ALL = DATA.reduce((n,t)=>n+t.tasks.length,0);
+function topicDone(t){ return t.tasks.filter(x=>P.done[x.id]).length; }
+function updateGlobal(){
+  const d = Object.keys(P.done).filter(k=>P.done[k]).length;
+  $("#gcount").textContent = d + " / " + ALL;
+  $("#gbar").style.width = (100*d/ALL) + "%";
+}
+
+// ---------- python ----------
+const RUNNER = `
+import sys, io, json, traceback
+def __run_user(code, inputs_json, echo, limit):
+    q = list(json.loads(inputs_json))
+    out = io.StringIO()
+    def _input(prompt=''):
+        if echo and prompt:
+            out.write(str(prompt))
+        if not q:
+            raise EOFError('NOINPUT')
+        v = q.pop(0)
+        if echo:
+            out.write('\\x01' + v + '\\x02\\n')
+        return v
+    steps = [0]
+    FN = '<твой код>'
+    def tracer(frame, event, arg):
+        if frame.f_code.co_filename != FN:
+            return None
+        if event == 'line':
+            steps[0] += 1
+            if steps[0] > limit:
+                raise RuntimeError('TOOLONG')
+        return tracer
+    g = {'__name__': '__main__', 'input': _input}
+    old = sys.stdout
+    sys.stdout = out
+    err = None
+    try:
+        c = compile(code, FN, 'exec')
+        sys.settrace(tracer)
+        try:
+            exec(c, g)
+        finally:
+            sys.settrace(None)
+    except SyntaxError as e:
+        err = {'type': type(e).__name__, 'msg': str(e.msg), 'line': e.lineno}
+    except BaseException as e:
+        line = None
+        for fr in traceback.extract_tb(e.__traceback__):
+            if fr.filename == FN:
+                line = fr.lineno
+        err = {'type': type(e).__name__, 'msg': str(e), 'line': line}
+    finally:
+        sys.stdout = old
+    return json.dumps({'out': out.getvalue(), 'err': err, 'left': len(q)})
+`;
+let pyPromise = null;
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=()=>rej(new Error("script")); document.head.appendChild(s); }); }
+function getPy(){
+  if (!pyPromise){
+    pyPromise = (async()=>{
+      await loadScript(PYO + "pyodide.js");
+      const py = await loadPyodide({indexURL: PYO});
+      py.runPython(RUNNER);
+      return py;
+    })();
+    pyPromise.catch(()=>{ pyPromise = null; });
+  }
+  return pyPromise;
+}
+async function runPy(code, inputs, echo){
+  const py = await getPy();
+  const fn = py.globals.get("__run_user");
+  const r = JSON.parse(fn(code, JSON.stringify(inputs||[]), !!echo, 300000));
+  fn.destroy && fn.destroy();
+  return r;
+}
+function explainErr(e){
+  const at = e.line ? ` (строка ${e.line})` : "";
+  const m = e.msg || "";
+  const T = {
+    SyntaxError: "Ошибка в записи кода. Проверь кавычки, скобки и двоеточие после if / for / while / else.",
+    IndentationError: "Ошибка с отступами. Команды внутри if / for / while нужно сдвигать на 4 пробела, а остальные — нет.",
+    TabError: "Перепутаны пробелы и Tab в отступах. Используй что-то одно.",
+    NameError: "Python не знает такого имени. Может, опечатка? Забыл кавычки у текста? Или переменная ещё не создана?",
+    TypeError: "Смешаны разные типы. Например, нельзя сложить строку и число. Может, забыл int()?",
+    ValueError: "Неподходящее значение. Например, int() получил не число.",
+    ZeroDivisionError: "Делить на ноль нельзя!",
+    IndexError: "Такого номера в списке нет. Помни: нумерация начинается с 0, а последний номер — len(список) - 1.",
+    AttributeError: "У этого значения нет такой команды. Проверь, правильно ли написано название (например, append).",
+    KeyboardInterrupt: "Программа остановлена."
+  };
+  if (e.type === "EOFError" && m === "NOINPUT") return "Программа просит ввести ещё данные, а их больше нет. Может, лишний input()?" + at;
+  if (e.type === "RuntimeError" && m === "TOOLONG") return "Программа работает слишком долго. Похоже на бесконечный цикл: проверь, меняется ли переменная из условия while." + at;
+  return (T[e.type] || "Ошибка при выполнении.") + at + `\n${e.type}: ${m}`;
+}
+function norm(s){
+  let L = String(s).replace(/\r/g,"").split("\n").map(x=>x.replace(/\s+$/,""));
+  while (L.length && !L[L.length-1]) L.pop();
+  while (L.length && !L[0]) L.shift();
+  return L.join("\n").replace(/ё/g,"е").replace(/Ё/g,"Е");
+}
+const loose = s => norm(s).split("\n").map(x=>x.trim().replace(/\s+/g," ")).join("\n");
+
+// ---------- editor ----------
+function editor(ta, onRun){
+  const ins = t => { ta.focus(); if (!document.execCommand("insertText", false, t)) ta.setRangeText(t, ta.selectionStart, ta.selectionEnd, "end"); };
+  ta.addEventListener("keydown", e=>{
+    if ((e.ctrlKey||e.metaKey) && e.key==="Enter"){ e.preventDefault(); onRun&&onRun(); return; }
+    if (e.key==="Tab"){
+      e.preventDefault();
+      if (e.shiftKey){
+        const v=ta.value, s=ta.selectionStart, ls=v.lastIndexOf("\n", s-1)+1;
+        const m=v.slice(ls).match(/^ {1,4}/);
+        if (m){ ta.setSelectionRange(ls, ls+m[0].length); ins(""); }
+      } else ins("    ");
+    }
+    if (e.key==="Enter" && !e.shiftKey){
+      const v=ta.value, s=ta.selectionStart, ls=v.lastIndexOf("\n", s-1)+1, line=v.slice(ls, s);
+      let ind=(line.match(/^ */)||[""])[0];
+      if (/:\s*$/.test(line)) ind+="    ";
+      e.preventDefault(); ins("\n"+ind);
+    }
+    if (e.key==="Backspace" && ta.selectionStart===ta.selectionEnd){
+      const v=ta.value, s=ta.selectionStart, ls=v.lastIndexOf("\n", s-1)+1, before=v.slice(ls,s);
+      if (before.length>=4 && /^ +$/.test(before) && before.length%4===0){ e.preventDefault(); ta.setSelectionRange(s-4,s); ins(""); }
+    }
+  });
+}
+
+// ---------- views ----------
+let view = {name:"home"};
+function go(v){ view=v; render(); window.scrollTo(0,0); }
+$("#home").onclick = ()=>go({name:"home"});
+$("#sbxBtn").onclick = ()=>go({name:"sandbox"});
+
+function render(){
+  updateGlobal();
+  if (view.name==="home") return renderHome();
+  if (view.name==="topic") return renderTopic();
+  if (view.name==="sandbox") return renderSandbox();
+}
+
+function renderHome(){
+  const app=$("#app");
+  app.innerHTML = `
+  <h1>Привет! Учим Python 🐍</h1>
+  <p class="sub">8 тем: от первой команды до списков. В каждой — объяснение и задачи.</p>
+  <div class="howto">
+    <b>Как заниматься:</b> открой тему, прочитай объяснение (там есть примеры — попробуй их в 🧪 Песочнице), потом решай задачи по порядку.
+    Задачи бывают трёх видов: <b>тест</b> (выбери ответ), <b>«что выведет?»</b> (угадай, что напечатает программа) и <b>«напиши код»</b> (программу проверит настоящий Python).
+    Прогресс сохраняется в этом браузере.
+  </div>
+  <div class="grid">${DATA.map((t,i)=>{
+    const d=topicDone(t), n=t.tasks.length;
+    return `<div class="tcard ${d===n?'done':''}" data-i="${i}">
+      <div class="top"><div class="em">${t.emoji}</div><div><div class="num">Тема ${i+1}</div><div class="tt">${esc(t.title)}</div></div></div>
+      <div class="meta"><div class="bar"><i style="width:${100*d/n}%"></i></div>${d===n?'✅ ':''}${d}/${n}</div>
+    </div>`;}).join("")}</div>
+  <div class="foot">
+    <button class="btn small ghost" id="reset">Сбросить прогресс</button>
+    <span id="resetQ"></span>
+  </div>`;
+  app.querySelectorAll(".tcard").forEach(c=>c.onclick=()=>go({name:"topic", i:+c.dataset.i, tab: topicDone(DATA[+c.dataset.i])?"tasks":"theory", k: firstUndone(DATA[+c.dataset.i])}));
+  $("#reset").onclick=()=>{
+    $("#resetQ").innerHTML=`Точно стереть все решения? <button class="btn small" style="background:var(--red)" id="resetY">Да, стереть</button>`;
+    $("#resetY").onclick=()=>{ P={done:{},code:{},tries:{}}; save(); render(); };
+  };
+}
+function firstUndone(t){ const k=t.tasks.findIndex(x=>!P.done[x.id]); return k<0?0:k; }
+
+function renderTopic(){
+  const t=DATA[view.i], app=$("#app");
+  const d=topicDone(t);
+  app.innerHTML = `
+  <button class="back" id="bk">← Все темы</button>
+  <h1>${t.emoji} ${esc(t.title)}</h1>
+  <div class="tabs">
+    <button class="tab ${view.tab==='theory'?'on':''}" data-tab="theory">📖 Объяснение</button>
+    <button class="tab ${view.tab==='tasks'?'on':''}" data-tab="tasks">✏️ Задачи ${d}/${t.tasks.length}</button>
+  </div>
+  <div id="body"></div>`;
+  $("#bk").onclick=()=>go({name:"home"});
+  app.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{ view.tab=b.dataset.tab; renderTopic(); });
+  if (view.tab==="theory"){
+    $("#body").innerHTML = `<div class="panel theory">${t.theory}
+      <div class="actions" style="margin-top:24px"><button class="btn" id="toTasks">Перейти к задачам →</button></div></div>`;
+    $("#toTasks").onclick=()=>{ view.tab="tasks"; renderTopic(); window.scrollTo(0,0); };
+  } else renderTask();
+}
+
+function codeQ(text){ // quiz text: lines after first = code
+  const L=text.split("\n");
+  if (L.length===1) return esc(text);
+  return esc(L[0]) + `<pre class="code" style="font-weight:400;font-size:15px">${esc(L.slice(1).join("\n"))}</pre>`;
+}
+
+function renderTask(){
+  const t=DATA[view.i], k=view.k||0, task=t.tasks[k], body=$("#body");
+  const all = t.tasks.every(x=>P.done[x.id]);
+  const kinds={quiz:"Тест", out:"Что выведет?", code:"Напиши код"};
+  body.innerHTML = `
+  ${all?`<div class="donebanner">🏆 Все задачи темы решены! Можно переходить к следующей теме.</div>`:''}
+  <div class="dots">${t.tasks.map((x,j)=>`<button class="dot ${P.done[x.id]?'done':''} ${j===k?'cur':''}" data-j="${j}" title="${kinds[x.t]}">${j+1}</button>`).join("")}</div>
+  <div class="panel" id="tp">
+    <span class="kind ${task.t}">${kinds[task.t]}</span>${P.done[task.id]?' <span class="status">✅ решено</span>':''}
+    <div id="tbody"></div>
+    <div class="fb" id="fb"></div>
+    <div class="navrow">
+      <button class="btn ghost" id="prev" ${k===0?'disabled':''}>← Назад</button>
+      <button class="btn ghost" id="next">${k===t.tasks.length-1?(view.i<DATA.length-1?'Следующая тема →':'К темам'):'Дальше →'}</button>
+    </div>
+  </div>`;
+  body.querySelectorAll(".dot").forEach(b=>b.onclick=()=>{ view.k=+b.dataset.j; renderTask(); });
+  $("#prev").onclick=()=>{ view.k=k-1; renderTask(); };
+  $("#next").onclick=()=>{
+    if (k<t.tasks.length-1){ view.k=k+1; renderTask(); }
+    else if (view.i<DATA.length-1) go({name:"topic", i:view.i+1, tab:"theory", k:0});
+    else go({name:"home"});
+  };
+  const tb=$("#tbody");
+  if (task.t==="quiz") renderQuiz(task, tb);
+  else if (task.t==="out") renderOut(task, tb);
+  else renderCode(task, tb);
+}
+
+function markDone(task){
+  const was=P.done[task.id];
+  P.done[task.id]=true; save(); updateGlobal();
+  const t=DATA[view.i];
+  // refresh dots + tab counter without rerendering the task
+  document.querySelectorAll(".dot").forEach((b,j)=>{ if (P.done[t.tasks[j].id]) b.classList.add("done"); });
+  const tabs=document.querySelectorAll(".tab"); if (tabs[1]) tabs[1].textContent=`✏️ Задачи ${topicDone(t)}/${t.tasks.length}`;
+  if (!was){ confetti(t.tasks.every(x=>P.done[x.id]) ? 160 : 50); }
+}
+const PRAISE=["Отлично! 🎉","Верно! 💪","Так держать! 🚀","Супер! ⭐","Правильно! 👍","Молодец! 🔥","Точно в цель! 🎯"];
+const praise=()=>PRAISE[Math.floor(Math.random()*PRAISE.length)];
+function fb(kind, html){ const f=$("#fb"); f.className="fb show "+kind; f.innerHTML=html; }
+
+function renderQuiz(task, el){
+  el.innerHTML = `<div class="q">${codeQ(task.q)}</div>
+    <div class="opts">${task.opts.map((o,j)=>`<button class="opt" data-j="${j}"><span class="l">${"АБВГД"[j]}</span><span class="mono" style="font-family:inherit">${esc(o)}</span></button>`).join("")}</div>`;
+  el.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const j=+b.dataset.j;
+    el.querySelectorAll(".opt").forEach(x=>x.classList.remove("ok","bad","sel"));
+    if (j===task.a){
+      b.classList.add("ok"); markDone(task);
+      fb("ok", `<h4>${praise()}</h4>${esc(task.why||"")}`);
+    } else {
+      b.classList.add("bad");
+      fb("bad", `<h4>Не совсем 🤔</h4>Подумай ещё и попробуй другой вариант.`);
+    }
+  });
+}
+
+function inputsHtml(inp){
+  if (!inp || !inp.length) return "";
+  return `<div class="inputs"><b>Пользователь вводит</b> (по очереди): ${inp.map(x=>`<span class="mono">${esc(x)}</span>`).join(" ")}</div>`;
+}
+
+function renderOut(task, el){
+  el.innerHTML = `<div class="q">${esc(task.q)}</div>
+    <pre class="code">${esc(task.code)}</pre>
+    ${inputsHtml(task.inputs)}
+    <label class="fl">Твой ответ — напиши точно так, как будет на экране (каждую строку — с новой строки):</label>
+    <textarea class="ans mono" id="ans" spellcheck="false" rows="${Math.max(2, task.a.split("\n").length+1)}"></textarea>
+    <div class="actions"><button class="btn" id="chk">Проверить</button><button class="btn ghost" id="show" style="display:none">Показать ответ</button></div>`;
+  let tries=0;
+  $("#chk").onclick=()=>{
+    const v=$("#ans").value;
+    if (!v.trim()){ fb("info","Сначала напиши ответ 🙂"); return; }
+    if (loose(v)===loose(task.a)){
+      markDone(task); fb("ok", `<h4>${praise()}</h4>${esc(task.why||"")}`);
+    } else {
+      tries++;
+      fb("bad", `<h4>Пока не то 🤔</h4>Пройди по программе строчка за строчкой, как компьютер: что лежит в переменных и что печатает каждый print?`+(task.why&&tries>=2?`<br><b>Подсказка:</b> ${esc(task.why)}`:""));
+      if (tries>=2) $("#show").style.display="";
+    }
+  };
+  $("#show").onclick=()=>fb("info", `<b>Правильный ответ:</b><pre>${esc(task.a)}</pre>${esc(task.why||"")}<br>Попробуй понять, почему так, и введи его сам.`);
+}
+
+function renderCode(task, el){
+  const ex = task.hide ? "" : (()=>{
+    const inp=task.tests[0], out=task.exp[0];
+    if (!inp.length) return `<div class="example"><div style="grid-column:1/-1"><span class="lbl">На экране должно быть:</span><pre>${esc(out)}</pre></div></div>`;
+    let h="";
+    for (let j=0;j<Math.min(2,task.tests.length);j++)
+      h+=`<div class="example"><div><span class="lbl">Пример ${j+1}: ввод</span><pre>${esc(task.tests[j].join("\n"))}</pre></div><div><span class="lbl">вывод</span><pre>${esc(task.exp[j])}</pre></div></div>`;
+    return h;
+  })();
+  const saved = P.code[task.id];
+  el.innerHTML = `<div class="q">${esc(task.q)}</div>${ex}
+    <label class="fl">Твой код: (Tab — отступ, Ctrl+Enter — проверить)</label>
+    <textarea class="ed" id="ed" spellcheck="false" autocapitalize="off" autocomplete="off">${esc(saved!=null?saved:(task.start?task.start+"\n":""))}</textarea>
+    <div class="actions">
+      <button class="btn green" id="chk">▶ Проверить</button>
+      <button class="btn ghost" id="hintB">💡 Подсказка</button>
+      <button class="btn ghost" id="solB" style="display:none">Показать решение</button>
+      <span class="status" id="st"></span>
+    </div>
+    <div class="hint" id="hint"></div>
+    <div class="sol" id="sol"><label class="fl">Одно из решений:</label><pre class="code">${esc(task.sol)}</pre></div>`;
+  const ed=$("#ed");
+  ed.addEventListener("input", ()=>{ P.code[task.id]=ed.value; save(); });
+  const tries=()=>P.tries[task.id]||0;
+  if (tries()>=2 || P.done[task.id]) $("#solB").style.display="";
+  $("#hintB").onclick=()=>{ const h=$("#hint"); h.classList.add("show");
+    h.innerHTML = task.hint ? "💡 "+esc(task.hint) : "💡 Перечитай объяснение темы — там есть похожий пример. Двигайся маленькими шагами и проверяй.";
+  };
+  $("#solB").onclick=()=>$("#sol").classList.toggle("show");
+  const check=async()=>{
+    const code=ed.value;
+    if (!code.trim()){ fb("info","Сначала напиши код 🙂"); return; }
+    for (const [rx,msg] of task.need) if (!new RegExp(rx).test(code)){ fb("bad",`<h4>Почти!</h4>${esc(msg)}.`); return; }
+    for (const [rx,msg] of task.ban) if (new RegExp(rx).test(code)){ fb("bad",`<h4>Условие задачи</h4>${esc(msg)}.`); return; }
+    const btn=$("#chk"); btn.disabled=true;
+    $("#st").textContent = pyPromise ? "Проверяю…" : "Запускаю Python (первый раз — несколько секунд)…";
+    try{
+      let failed=null;
+      for (let j=0;j<task.tests.length;j++){
+        const r=await runPy(code, task.tests[j], false);
+        if (r.err){ failed={j, err:r.err, out:r.out}; break; }
+        if (norm(r.out)!==norm(task.exp[j])){ failed={j, out:r.out}; break; }
+      }
+      if (!failed){
+        markDone(task);
+        fb("ok", `<h4>${praise()}</h4>Все проверки пройдены: ${task.tests.length} из ${task.tests.length}.`);
+        $("#solB").style.display="";
+      } else {
+        P.tries[task.id]=tries()+1; save();
+        if (tries()>=2) $("#solB").style.display="";
+        const inp=task.tests[failed.j];
+        const inpH = inp.length ? `<div class="lbl">Ввод:</div><pre>${esc(inp.join("\n"))}</pre>` : "";
+        if (failed.err){
+          fb("bad", `<h4>Ошибка в программе 🐞</h4>${esc(explainErr(failed.err)).replace(/\n/g,"<br>")}${inpH}${failed.out?`<div class="lbl">Успело напечататься:</div><pre>${esc(failed.out)}</pre>`:""}`);
+        } else {
+          fb("bad", `<h4>Ответ не совпал (проверка ${failed.j+1} из ${task.tests.length})</h4>${inpH}
+            <div class="cols"><div><div class="lbl">Нужно:</div><pre>${esc(task.exp[failed.j])}</pre></div>
+            <div><div class="lbl">У тебя получилось:</div><pre>${esc(failed.out||"(пусто)")}</pre></div></div>
+            Сравни внимательно: пробелы, знаки препинания, большие и маленькие буквы.`);
+        }
+      }
+    } catch(e){
+      fb("bad", `<h4>Не получилось запустить Python</h4>Проверь интернет и попробуй ещё раз. Python загружается из интернета при первой проверке.`);
+    }
+    btn.disabled=false; $("#st").textContent="";
+  };
+  $("#chk").onclick=check;
+  editor(ed, check);
+  getPy().catch(()=>{}); // preload
+}
+
+// ---------- sandbox ----------
+let SBX = {code:'name = input("Как тебя зовут? ")\nprint("Привет,", name)\n\nfor i in range(3):\n    print(i)\n', inp:"Макс"};
+try { const s=localStorage.getItem(KEY+"_sbx"); if (s) SBX=JSON.parse(s); } catch(e) {}
+function renderSandbox(){
+  const app=$("#app");
+  app.innerHTML = `<button class="back" id="bk">← Все темы</button>
+  <h1>🧪 Песочница</h1>
+  <p class="sub">Здесь можно писать любой код и смотреть, что получится. Ничего не проверяется: просто экспериментируй!</p>
+  <div class="panel">
+    <label class="fl">Код (Ctrl+Enter — запустить):</label>
+    <textarea class="ed" id="ed" spellcheck="false" style="min-height:260px">${esc(SBX.code)}</textarea>
+    <label class="fl">Что вводит пользователь — каждое значение с новой строки (для input):</label>
+    <textarea class="ans" id="inp" spellcheck="false" style="min-height:60px">${esc(SBX.inp)}</textarea>
+    <div class="actions"><button class="btn green" id="run">▶ Запустить</button><button class="btn ghost" id="clr">Очистить код</button><span class="status" id="st"></span></div>
+    <label class="fl">На экране:</label>
+    <div class="sbx-out" id="out"></div>
+  </div>`;
+  $("#bk").onclick=()=>go({name:"home"});
+  const ed=$("#ed"), inp=$("#inp");
+  const sv=()=>{ SBX={code:ed.value, inp:inp.value}; try{localStorage.setItem(KEY+"_sbx", JSON.stringify(SBX));}catch(e){} };
+  ed.addEventListener("input", sv); inp.addEventListener("input", sv);
+  $("#clr").onclick=()=>{ ed.value=""; sv(); ed.focus(); };
+  const run=async()=>{
+    const b=$("#run"); b.disabled=true;
+    $("#st").textContent = pyPromise ? "Выполняю…" : "Запускаю Python (первый раз — несколько секунд)…";
+    try{
+      const lines = inp.value.replace(/\r/g,"").split("\n"); if (lines.length && lines[lines.length-1]==="") lines.pop();
+      const r=await runPy(ed.value, lines, true);
+      $("#out").innerHTML = esc(r.out).replace(/\x01/g,'<span class="typed">').replace(/\x02/g,'</span>') + (r.err?`<span class="err">${r.out&&!r.out.endsWith("\n")?"\n":""}${esc(explainErr(r.err))}</span>`:"") || "<span style='opacity:.5'>(программа ничего не напечатала)</span>";
+    } catch(e){ $("#out").innerHTML = `<span class="err">Не получилось загрузить Python. Проверь интернет.</span>`; }
+    b.disabled=false; $("#st").textContent="";
+  };
+  $("#run").onclick=run;
+  editor(ed, run);
+  getPy().catch(()=>{});
+}
+
+// ---------- confetti ----------
+function confetti(n){
+  const c=$("#conf"), x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
+  const cols=["#3572c6","#ffd43b","#22a35a","#ff6b6b","#a66bff"];
+  const ps=Array.from({length:n},()=>({x:innerWidth/2+(Math.random()-.5)*200,y:innerHeight*0.35,vx:(Math.random()-.5)*12,vy:-Math.random()*10-4,r:Math.random()*6+4,c:cols[Math.floor(Math.random()*5)],a:Math.random()*6}));
+  let f=0;
+  (function step(){
+    x.clearRect(0,0,c.width,c.height);
+    ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.35;p.a+=0.2;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore();});
+    if (++f<90) requestAnimationFrame(step); else x.clearRect(0,0,c.width,c.height);
+  })();
+}
+
+render();
+</script>
+</body>
+</html>
