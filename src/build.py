@@ -4,7 +4,7 @@ import os
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-from tasks import TOPICS
+from tasks import TOPICS, VARY
 
 
 def run(code, inputs):
@@ -33,9 +33,15 @@ def norm(s):
 
 def inline(s):
     s = html.escape(s, quote=False)
-    s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
+    codes = []
+
+    def keep(m):
+        codes.append(m.group(1))
+        return f"\x00{len(codes) - 1}\x00"
+
+    s = re.sub(r"`([^`]+)`", keep, s)          # код прячем, чтобы его не трогало оформление
     s = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", s)
-    return s
+    return re.sub(r"\x00(\d+)\x00", lambda m: "<code>" + codes[int(m.group(1))] + "</code>", s)
 
 
 def md(text):
@@ -105,9 +111,18 @@ for t in TOPICS:
                 print(f'--- {task["id"]} OUT:\n{task["a"]}')
             else:
                 exp = []
-                for inp in task["tests"]:
+                tests = list(task["tests"])
+                subs = [{} for _ in tests]
+                for inp in tests:
                     exp.append(run(task["sol"], inp).rstrip("\n"))
-                task["exp"] = exp
+                for v in VARY.pop(task["id"], []):
+                    code = task["sol"]
+                    for k, val in v.items():
+                        assert k in code and k in task["start"], f"vary key {k!r} not in sol/start"
+                        code = code.replace(k, val)
+                    tests.append(tests[0]); subs.append(v)
+                    exp.append(run(code, tests[0]).rstrip("\n"))
+                task["tests"], task["subs"], task["exp"] = tests, subs, exp
                 for rx, msg in task["need"]:
                     assert re.search(rx, task["sol"]), f"sol misses need {rx}"
                 for rx, msg in task["ban"]:
@@ -121,6 +136,7 @@ for t in TOPICS:
         total += 1
     data.append(tt)
 
+assert not VARY, f"unused VARY: {list(VARY)}"
 print("TOTAL", total, "ERRORS", errors)
 tpl = open(os.path.join(HERE, "template.html"), encoding="utf-8").read()
 js = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
