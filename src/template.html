@@ -433,7 +433,7 @@ function renderCode(task, el){
   const ex = task.hide ? "" : (()=>{
     const inp=task.tests[0], out=task.exp[0];
     if (!inp.length){
-      if (!/пример/i.test(task.q)) return "";
+      if (!/как в примере/i.test(task.q)) return "";
       return `<div class="example"><div style="grid-column:1/-1"><span class="lbl">На экране должно быть:</span><pre>${esc(out)}</pre></div></div>`;
     }
     let h="";
@@ -471,7 +471,14 @@ function renderCode(task, el){
     try{
       let failed=null;
       for (let j=0;j<task.tests.length;j++){
-        const r=await runPy(code, task.tests[j], false);
+        const sub=(task.subs&&task.subs[j])||{};
+        let c=code;
+        for (const k of Object.keys(sub)){
+          if (!c.includes(k)){ failed={j, keep:k}; break; }
+          c=c.split(k).join(sub[k]);
+        }
+        if (failed) break;
+        const r=await runPy(c, task.tests[j], false);
         if (r.err){ failed={j, err:r.err, out:r.out}; break; }
         if (norm(r.out)!==norm(task.exp[j])){ failed={j, out:r.out}; break; }
       }
@@ -483,8 +490,13 @@ function renderCode(task, el){
         P.tries[task.id]=tries()+1; save();
         if (tries()>=2) $("#solB").style.display="";
         const inp=task.tests[failed.j];
-        const inpH = inp.length ? `<div class="lbl">Ввод:</div><pre>${esc(inp.join("\n"))}</pre>` : "";
-        if (failed.err){
+        const sub=(task.subs&&task.subs[failed.j])||{};
+        const subKeys=Object.keys(sub);
+        let inpH = inp.length ? `<div class="lbl">Ввод:</div><pre>${esc(inp.join("\n"))}</pre>` : "";
+        if (subKeys.length) inpH = `Тренажёр проверил твой код с <b>другими данными</b> — в заготовке было:<pre>${esc(subKeys.map(k=>sub[k]).join("\n"))}</pre>Правильное решение должно работать с любыми данными, а не только с теми, что в задаче.` + inpH;
+        if (failed.keep){
+          fb("bad", `<h4>Не меняй заготовку</h4>Оставь строку <code>${esc(failed.keep)}</code> как была. По ней тренажёр проверяет решение на других данных.`);
+        } else if (failed.err){
           fb("bad", `<h4>Ошибка в программе 🐞</h4>${esc(explainErr(failed.err)).replace(/\n/g,"<br>")}${inpH}${failed.out?`<div class="lbl">Успело напечататься:</div><pre>${esc(failed.out)}</pre>`:""}`);
         } else {
           fb("bad", `<h4>Ответ не совпал (проверка ${failed.j+1} из ${task.tests.length})</h4>${inpH}
