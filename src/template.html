@@ -432,7 +432,10 @@ function renderOut(task, el){
 function renderCode(task, el){
   const ex = task.hide ? "" : (()=>{
     const inp=task.tests[0], out=task.exp[0];
-    if (!inp.length) return `<div class="example"><div style="grid-column:1/-1"><span class="lbl">На экране должно быть:</span><pre>${esc(out)}</pre></div></div>`;
+    if (!inp.length){
+      if (!/пример/i.test(task.q)) return "";
+      return `<div class="example"><div style="grid-column:1/-1"><span class="lbl">На экране должно быть:</span><pre>${esc(out)}</pre></div></div>`;
+    }
     let h="";
     for (let j=0;j<Math.min(2,task.tests.length);j++)
       h+=`<div class="example"><div><span class="lbl">Пример ${j+1}: ввод</span><pre>${esc(task.tests[j].join("\n"))}</pre></div><div><span class="lbl">вывод</span><pre>${esc(task.exp[j])}</pre></div></div>`;
