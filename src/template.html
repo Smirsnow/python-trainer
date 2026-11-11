@@ -18,6 +18,8 @@
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:17px;line-height:1.55}
 button{font-family:inherit;font-size:inherit;cursor:pointer}
 code,pre,textarea.ed,.mono{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace}
+/* без склеивания символов: != не превращается в ≠, >= в ≥ */
+code,pre,textarea,.mono,.typed{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
 header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);}
 .hwrap{max-width:980px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;gap:14px}
 .logo{font-weight:900;font-size:20px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
